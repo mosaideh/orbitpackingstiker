@@ -7,8 +7,19 @@ st.set_page_config(page_title="نظام طباعة ملصقات أوربت", lay
 
 st.title("🖨️ نظام إنشاء وطباعة ملصقات التعبئة (التصميم العريض)")
 
-# --- خيارات التحكم بالشعار والمنشأ ---
+# --- خيارات التحكم ---
 st.write("### ⚙️ إعدادات الطباعة")
+
+# 1. خيار عنوان الملصق (نوع الكويل)
+coil_type = st.radio(
+    "📌 اختر نوع الكويل (العنوان الرئيسي للملصق):",
+    options=["Mill Finish Aluminum Coils", "Coated Coils for Aluminum Structure"],
+    horizontal=True
+)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# 2. خيارات الشعار والمنشأ
 col_opt1, col_opt2 = st.columns(2)
 with col_opt1:
     show_logo = st.checkbox("إظهار شعار الشركة (صورة Orbit)", value=True)
@@ -20,7 +31,6 @@ st.markdown("---")
 
 uploaded_file = st.file_uploader("ارفع ملف الإكسل (Excel) هنا", type=['xlsx', 'xls'])
 
-# دالة لتحويل الصورة إلى Base64 لدمجها في الـ HTML
 def get_image_base64(image_path):
     if os.path.exists(image_path):
         with open(image_path, "rb") as img_file:
@@ -68,21 +78,20 @@ HTML_TEMPLATE = """
         }}
         
         .mid-top {{ width: 48%; border-right: 2px solid black; display: flex; flex-direction: column; }}
-        .title-bar {{ font-size: 22px; font-weight: bold; text-align: center; padding: 10px; border-bottom: 2px dotted #555; flex: 1; display: flex; align-items: center; justify-content: center; }}
+        .title-bar {{ font-size: 20px; font-weight: bold; text-align: center; padding: 10px; border-bottom: 2px dotted #555; flex: 1; display: flex; align-items: center; justify-content: center; text-transform: capitalize; }}
         .mid-info {{ display: flex; height: 50%; }}
         .info-cell {{ border-right: 2px dotted #555; padding: 5px 10px; display: flex; flex-direction: column; justify-content: center; flex: 1; }}
         .info-cell:last-child {{ border-right: none; }}
-        .info-cell span {{ font-size: 12px; color: #555; margin-bottom: 3px; }}
-        .info-cell strong {{ font-size: 16px; display: block; word-break: break-all; }}
+        .info-cell span {{ font-size: 14px; color: #555; margin-bottom: 3px; }}
+        .info-cell strong {{ display: block; word-wrap: break-word; line-height: 1.1; }}
 
         .right-top {{ width: 30%; display: flex; flex-direction: column; }}
         .rt-row {{ display: flex; flex: 1; border-bottom: 2px dotted #555; }}
         .rt-row:last-child {{ border-bottom: none; }}
         .rt-cell {{ flex: 1; border-right: 2px dotted #555; padding: 5px 10px; display: flex; flex-direction: column; justify-content: center; }}
         .rt-cell:last-child {{ border-right: none; }}
-        .rt-cell span {{ font-size: 12px; color: #555; margin-bottom: 3px; }}
-        .rt-cell strong {{ font-size: 18px; }}
-
+        .rt-cell span {{ font-size: 14px; color: #555; margin-bottom: 3px; }}
+        
         .bottom-section {{ display: flex; height: 65%; }}
         
         .weights-col {{ width: 22%; border-right: 3px solid black; display: flex; flex-direction: column; }}
@@ -92,8 +101,6 @@ HTML_TEMPLATE = """
         .w-horiz {{ background-color: black; color: white; text-align: center; padding: 5px; font-weight: bold; font-size: 16px; border-bottom: 2px solid black; }}
         
         .w-val {{ flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }}
-        
-        /* تعديلات الوزن لجعل الـ LBS بارزاً مثل الـ KG */
         .w-val-kg {{ font-size: 32px; font-weight: 900; line-height: 1; color: #000; }}
         .w-val-kg sub {{ font-size: 12px; font-weight: normal; margin-left: 2px; }}
         .w-val-lbs {{ font-size: 28px; font-weight: 900; color: #000; margin-top: 6px; line-height: 1; }}
@@ -102,8 +109,7 @@ HTML_TEMPLATE = """
         .details-col {{ width: 78%; padding: 15px; display: flex; flex-direction: column; gap: 15px; justify-content: space-between; }}
         .d-row {{ display: flex; gap: 15px; }}
         .d-cell {{ border: 2px dotted #888; padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: center; }}
-        .d-cell span {{ font-size: 14px; color: #555; margin-bottom: 5px; }}
-        .d-cell strong {{ font-size: 18px; }}
+        .d-cell span {{ font-size: 15px; color: #555; margin-bottom: 5px; }}
         
         @media print {{
             @page {{ size: landscape; margin: 0; }}
@@ -128,21 +134,21 @@ SINGLE_LABEL = """
                 {logo_content}
             </div>
             <div class="mid-top">
-                <div class="title-bar">Mill Finish Aluminum Coils</div>
+                <div class="title-bar">{coil_type_title}</div>
                 <div class="mid-info">
-                    <div class="info-cell"><span>Destination</span><strong>{destination}</strong></div>
-                    <div class="info-cell" style="flex:1.5;"><span>Sales Order</span><strong>{sales_order}</strong></div>
-                    <div class="info-cell"><span>PO</span><strong>{po}</strong></div>
+                    <div class="info-cell"><span>Destination</span><strong style="font-size: 22px;">{destination}</strong></div>
+                    <div class="info-cell" style="flex:1.5;"><span>Sales Order</span><strong style="font-size: 22px;">{sales_order}</strong></div>
+                    <div class="info-cell"><span>PO</span><strong style="font-size: 34px;">{po}</strong></div>
                 </div>
             </div>
             <div class="right-top">
                 <div class="rt-row">
-                    <div class="rt-cell"><span>Package #</span><strong>{package}</strong></div>
-                    <div class="rt-cell" style="align-items:center;"><strong>{origin_content}</strong></div>
+                    <div class="rt-cell" style="flex:1.5;"><span>Package #</span><strong style="font-size: 38px; line-height: 1;">{package}</strong></div>
+                    <div class="rt-cell" style="align-items:center;"><strong style="font-size: 18px;">{origin_content}</strong></div>
                 </div>
                 <div class="rt-row">
-                    <div class="rt-cell"><span>Pallet Size</span><strong>{pallet_size}</strong></div>
-                    <div class="rt-cell"><span>Slits #</span><strong>{slits}</strong></div>
+                    <div class="rt-cell"><span>Pallet Size</span><strong style="font-size: 34px;">{pallet_size}</strong></div>
+                    <div class="rt-cell"><span>Slits #</span><strong style="font-size: 26px;">{slits}</strong></div>
                 </div>
             </div>
         </div>
@@ -174,17 +180,17 @@ SINGLE_LABEL = """
             <div class="details-col">
                 <div class="d-row">
                     <div class="d-cell" style="width: 100%;">
-                        <span>Customer Name</span><strong style="font-size: 24px;">{customer}</strong>
+                        <span>Customer Name</span><strong style="font-size: 26px;">{customer}</strong>
                     </div>
                 </div>
                 <div class="d-row">
-                    <div class="d-cell" style="flex: 2;"><span>Description</span><strong>{description}</strong></div>
-                    <div class="d-cell"><span>Item Number</span><strong>{item_number}</strong></div>
+                    <div class="d-cell" style="flex: 2;"><span>Description</span><strong style="font-size: 28px; line-height: 1.1;">{description}</strong></div>
+                    <div class="d-cell"><span>Item Number</span><strong style="font-size: 36px;">{item_number}</strong></div>
                 </div>
                 <div class="d-row">
-                    <div class="d-cell"><span>CustReference</span><strong>{cust_ref}</strong></div>
-                    <div class="d-cell"><span>Coils</span><strong>{coil_details}</strong></div>
-                    <div class="d-cell" style="flex:1.5;"><span>Dimensions Inch</span><strong style="font-size: 22px;">{dimensions}</strong></div>
+                    <div class="d-cell"><span>CustReference</span><strong style="font-size: 26px;">{cust_ref}</strong></div>
+                    <div class="d-cell"><span>Coils</span><strong style="font-size: 34px;">{coil_details}</strong></div>
+                    <div class="d-cell" style="flex:1.5;"><span>Dimensions Inch</span><strong style="font-size: 28px;">{dimensions}</strong></div>
                 </div>
             </div>
         </div>
@@ -250,6 +256,7 @@ if uploaded_file is not None:
 
             label = SINGLE_LABEL.format(
                 logo_content=logo_html,
+                coil_type_title=coil_type, 
                 origin_content=origin_content,
                 customer=get_val(row, ['Customer Name', 'CustomerName']),
                 destination=get_val(row, ['Destination', 'Destinatio']),
@@ -274,10 +281,11 @@ if uploaded_file is not None:
         final_html = HTML_TEMPLATE.format(labels_content=labels_html)
         
         b64 = base64.b64encode(final_html.encode('utf-8')).decode('utf-8')
-        href = f'<a href="data:text/html;base64,{b64}" download="Orbit_Labels_Final.html" target="_blank" style="text-decoration:none;"><button style="background-color:#4CAF50; color:white; padding:12px 24px; border:none; border-radius:5px; cursor:pointer; font-size:16px; font-weight:bold;">📥 تحميل الملصقات النهائية للطباعة</button></a>'
+        href = f'<a href="data:text/html;base64,{b64}" download="Orbit_Labels_HugeFonts.html" target="_blank" style="text-decoration:none;"><button style="background-color:#4CAF50; color:white; padding:12px 24px; border:none; border-radius:5px; cursor:pointer; font-size:16px; font-weight:bold;">📥 تحميل الملصقات للطباعة</button></a>'
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown(href, unsafe_allow_html=True)
 
     except Exception as e:
         st.error(f"حدث خطأ أثناء قراءة البيانات: {e}")
+        
