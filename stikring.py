@@ -13,7 +13,7 @@ st.write("### ⚙️ إعدادات الطباعة")
 # 1. خيار عنوان الملصق (نوع الكويل)
 coil_type = st.radio(
     "📌 اختر نوع الكويل (العنوان الرئيسي للملصق):",
-    options=["Mill Finish Aluminum Coils", "Coated Coils for Aluminum Structure","Coated Coils for Steel Structure"],
+    options=["Mill Finish Aluminum Coils", "Coated Coils for Aluminum Structure","Coated Coils for Steel Structure","Mill Finish Steel Coils"],
     horizontal=True
 )
 
